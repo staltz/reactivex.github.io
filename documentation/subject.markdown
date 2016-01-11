@@ -163,8 +163,19 @@ id: subject
 
   {% lang_operator RxJS %}
     <p>
-     <span style="color:#f00">TBD</span>
+      In RxJS, all four Subject variants exist, except "PublishSubject" is known as simply <code>Subject</code> in RxJS and is the base class for the other Subject types.
     </p>
+    <table class="table">
+     <thead>
+      <tr><th>Subject</th><th>Purpose</th></tr>
+     </thead>
+     <tbody>
+      <tr><td><code>Rx.Subject</code></td><td>an Observer and an Observable holding no memory of values emitted in the past.</td></tr>
+      <tr><td><code>Rx.AsyncSubject</code></td><td>an Observer and an Observable which emits the last observed value only when it observes 'complete'. Before 'complete', it emits no values, except errors.</td></tr>
+      <tr><td><code>Rx.BehaviorSubject</code></td><td>an Observer and an Observable which holds the latest value emitted, to supply it to Observers that subscribe later in time.</td></tr>
+      <tr><td><code>Rx.ReplaySubject</code></td><td>an Observer and an Observable which holds a buffer of multiple recently emitted values, and supplies them to Observers that subscriber later in time, even if the ReplaySubject has already completed.</td></tr>
+     </tbody>
+    </table>
     <h4>See Also</h4>
     <ul>
      <li><a href="http://xgrommx.github.io/rx-book/content/subjects/index.html">Subjects</a> by Denis Stoyanov</li>
