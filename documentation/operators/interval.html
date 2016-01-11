@@ -123,39 +123,26 @@ id: interval
       RxJS implements this operator as <code>interval</code>. It accepts as its parameter the number
       of milliseconds to wait between emissions.
      </p><p>
-      <code>interval</code> operates by default on the <code>timeout</code>
+      <code>interval</code> operates by default on the <code>asap</code>
       <a href="../scheduler.html">Scheduler</a>, or you can optionally pass in a different Scheduler as a second
       parameter, and <code>interval</code> will operate on that Scheduler instead.
      </p>
      <h4>Sample Code</h4>
      <div class="code javascript"><pre>
 var source = Rx.Observable
-    .interval(500 /* ms */)
-    .timeInterval()
-    .take(3);
+  .interval(500 /* ms */)
+  .timeInterval()
+  .take(3);
 
 var subscription = source.subscribe(
-    function (x) {
-        console.log('Next: ' + x);
-    },
-    function (err) {
-        console.log('Error: ' + err);
-    },
-    function () {
-        console.log('Completed');
-    });</pre></div><div class="output"><pre>
+  (x) => console.log('Next: ' + x)
+  (err) => console.log('Error: ' + err)
+  () => console.log('Completed')
+);</pre></div><div class="output"><pre>
 Next: {value: 0, interval: 500}
 Next: {value: 1, interval: 500}
 Next: {value: 2, interval: 500}
 Completed</pre></div>
-     <p>
-      <code>interval</code> is found in the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-      <li><code>rx.timejs</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-     </ul>
      </figcaption>
     </figure>
   {% endlang_operator %}
