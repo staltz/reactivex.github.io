@@ -148,199 +148,55 @@ Sequence complete.</pre></div>
     </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS create createWithDisposable generate generateWithAbsoluteTime generateWithRelativeTime %}
+  {% lang_operator RxJS create %}
     <figure class="variant">
      <img src="images/create.png" style="width:100%;" alt="create" />
      <figcaption><p>
-      RxJS implements this operator as <code>create</code> (there is also an alternate name for the
-      same operator: <code>createWithDisposable</code>).
+      RxJS implements this operator as <code>create</code>.
      </p>
      <h4>Sample Code</h4>
      <div class="code javascript"><pre>
 /* Using a function */
 var source = Rx.Observable.create(function (observer) {
-    observer.onNext(42);
-    observer.onCompleted();
+  observer.next(42);
+  observer.complete();
 
-    // Note that this is optional, you do not have to return this if you require no cleanup
-    return function () { console.log('disposed'); };
+  // Note that this is optional, you do not have to return
+  // this if you require no cleanup
+  return function () {
+    console.log('disposed');
+  };
 });
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div><div class="output"><pre>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+    <div class="output"><pre>
 Next: 42
 Completed</pre></div>
      <div class="code javascript"><pre>
-/* Using a disposable */
+/* Returning a Subscription from within create() */
 var source = Rx.Observable.create(function (observer) {
-    observer.onNext(42);
-    observer.onCompleted();
+  observer.next(42);
+  observer.complete();
 
-    // Note that this is optional, you do not have to return this if you require no cleanup
-    return Rx.Disposable.create(function () {
-        console.log('disposed');
-    });
+  // Note that this is optional, you do not have to return
+  // this if you require no cleanup
+  return Rx.Subscription.create(function () {
+    console.log('disposed');
+  });
 });
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div><div class="output"><pre>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+    <div class="output"><pre>
 Next: 42
 Completed</pre></div>
-     <p>
-      <code>create</code> is found in the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
-     </figcaption>
-    </figure>
-    <figure class="variant">
-     <img src="images/generate.png" style="width:100%;" alt="generate" />
-     <figcaption><p>
-      You can use the <code>generate</code> operator to create simple Observables that can generate their
-      next emissions, and can determine when to terminate, based on the value of the previous emission. The
-      basic form of <code>generate</code> takes four parameters:
-     </p><ol>
-      <li>the first item to emit</li>
-      <li>a function to test an item to determine whether to emit it (<code>true</code>) or terminate the
-          Observable (<code>false</code>)</li>
-      <li>a function to generate the next item to test and emit based on the value of the previous item</li>
-      <li>a function to transform items before emitting them</li>
-     </ol><p>
-      You can also pass in as an optional fifth parameter a <a href="../scheduler.html">Scheduler</a> that
-      <code>generate</code> will use to create and emit its sequence (it uses <code>currentThread</code> by
-      default).
-     </p>
-     <h4>Sample Code</h4>
-     <div class="code javascript"><pre>
-var source = Rx.Observable.generate(
-    0,
-    function (x) { return x &lt; 3; },
-    function (x) { return x + 1; },
-    function (x) { return x; }
-);
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-     <div class="output"><pre>
-Next: 0
-Next: 1
-Next: 2
-Completed</pre></div>
-     <p>
-      <code>generate</code> is found in the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
-     </figcaption>
-    </figure>
-    <figure class="variant">
-     <img src="images/generateWithRelativeTime.png" style="width:100%;" alt="generateWithRelativeTime" />
-     <figcaption><p>
-      You can use the <code>generateWithRelativeTime</code> operator to create simple Observables that can
-      generate their next emissions, and can determine when to terminate, based on the value of the previous
-      emission. The basic form of <code>generateWithRelativeTime</code> takes five parameters:
-     </p><ol>
-      <li>the first item to emit</li>
-      <li>a function to test an item to determine whether to emit it (<code>true</code>) or terminate the
-          Observable (<code>false</code>)</li>
-      <li>a function to generate the next item to test and emit based on the value of the previous item</li>
-      <li>a function to transform items before emitting them</li>
-      <li>a function to indicate how long, in milliseconds, the generator should wait after the emission of
-          the previous item before emitting this item</li>
-     </ol><p>
-      You can also pass in as an optional sixth parameter a <a href="../scheduler.html">Scheduler</a> that
-      <code>generate</code> will use to create and emit its sequence (it uses <code>currentThread</code> by
-      default).
-     </p>
-     <h4>Sample Code</h4>
-     <div class="code javascript"><pre>
-var source = Rx.Observable.generateWithRelativeTime(
-    1,
-    function (x) { return x &lt; 4; },
-    function (x) { return x + 1; },
-    function (x) { return x; },
-    function (x) { return 100 * x; }
-).timeInterval();
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-     <div class="output"><pre>
-Next: {value: 1, interval: 100}
-Next: {value: 2, interval: 200}
-Next: {value: 3, interval: 300}
-Completed</pre></div>
-     <p>
-      <code>generateWithRelativeTime</code> is found in the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-      <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-     </ul>
-     </figcaption>
-    </figure>
-    <figure class="variant">
-     <img src="images/generateWithAbsoluteTime.png" style="width:100%;" alt="generateWithAbsoluteTime" />
-     <figcaption><p>
-      You can use the <code>generateWithAbsoluteTime</code> operator to create simple Observables that can
-      generate their next emissions, and can determine when to terminate, based on the value of the previous
-      emission. The basic form of <code>generateWithAbsoluteTime</code> takes five parameters:
-     </p><ol>
-      <li>the first item to emit</li>
-      <li>a function to test an item to determine whether to emit it (<code>true</code>) or terminate the
-          Observable (<code>false</code>)</li>
-      <li>a function to generate the next item to test and emit based on the value of the previous item</li>
-      <li>a function to transform items before emitting them</li>
-      <li>a function to indicate at what time (expressed as a <code>Date</code>) the generator should emit the
-          the new item</li>
-     </ol><p>
-      You can also pass in as an optional sixth parameter a <a href="../scheduler.html">Scheduler</a> that
-      <code>generate</code> will use to create and emit its sequence (it uses <code>currentThread</code> by
-      default).
-     </p>
-     <h4>Sample Code</h4>
-     <div class="code javascript"><pre>
-var source = Rx.Observable.generate(
-    1,
-    function (x) { return x &lt; 4; },
-    function (x) { return x + 1; },
-    function (x) { return x; },
-    function (x) { return Date.now() + (100 * x); }
-).timeInterval();
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-     <div class="output"><pre>
-Next: {value: 1, interval: 100}
-Next: {value: 2, interval: 200}
-Next: {value: 3, interval: 300}
-Completed</pre></div>
-     <p>
-      <code>generateWithAbsoluteTime</code> is found in the following distribution:
-     </p>
-     <ul>
-      <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-     </ul>
      </figcaption>
     </figure>
   {% endlang_operator %}
