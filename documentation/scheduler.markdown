@@ -332,11 +332,10 @@ someScheduler.schedulePeriodically(someAction, 500, 250, TimeUnit.MILLISECONDS);
       <tr><th>Scheduler</th><th>purpose</th></tr>
      </thead>
      <tbody>
-      <tr><td><code>Rx.Scheduler.currentThread</code></td><td>schedules work as soon as possible on the current thread</td></tr>
-      <tr><td><code>Rx.HistoricalScheduler</code></td><td>schedules work as though it were occurring at an arbitrary historical time</td></tr>
-      <tr><td><code>Rx.Scheduler.immediate</code></td><td>schedules work immediately on the current thread</td></tr>
-      <tr><td><code>Rx.TestScheduler</code></td><td>for unit testing; this allows you to manually manipulate the movement of time</td></tr>
-      <tr><td><code>Rx.Scheduler.timeout</code></td><td>schedules work by means of a timed callback</td></tr>
+      <tr><td><code>Rx.Scheduler.asap</code></td><td>schedules work on the micro task queue using the next event loop iteration</td></tr>
+      <tr><td><code>Rx.Scheduler.queue</code></td><td>schedules work on a queue in the current event loop iteration (trampoline scheduler)</td></tr>
+      <tr><td><code>Rx.VirtualTimeScheduler</code></td><td>schedules work with virtual timestamps, allowing you to manually simulate the progression of time</td></tr>
+      <tr><td><code>Rx.TestScheduler</code></td><td>schedules work on a VirtualTimeScheduler, including some helper functions to assist writing tests with this scheduler</td></tr>
      </tbody>
     </table>
     <h4>See Also</h4>
