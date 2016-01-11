@@ -71,9 +71,9 @@ id: just
      <h4>Sample Code</h4>
      <div class="code groovy"><pre>
 // Observable emits "some string" as a single item
-def observableThatEmitsAString = Observable.just("some string"); 
+def observableThatEmitsAString = Observable.just("some string");
 // Observable emits the list [1, 2, 3, 4, 5] as a single item
-def observableThatEmitsAList = Observable.just([1, 2, 3, 4, 5]); 
+def observableThatEmitsAList = Observable.just([1, 2, 3, 4, 5]);
 // Observable emits 1, 2, 3, 4, and 5 as distinct items
 def observableThatEmitsSeveralNumbers = Observable.just( 1, 2, 3, 4, 5 );</pre></div>
      <ul>
@@ -122,37 +122,25 @@ Sequence complete.</pre></div>
     </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS just return %}
+  {% lang_operator RxJS of %}
     <figure class="variant">
-     <img src="images/just.png" style="width:100%;" alt="just" />
      <figcaption><p>
-      RxJS implements this operator as <code>return</code> and as <code>just</code> (two names for
-      the same operator with the same behavior). It accepts a single item as a parameter and returns
-      an Observable that emits that single item as its sole emission.
-     </p><p>
-      <code>return</code>/<code>just</code> operates by default on the <code>immediate</code>
-      <a href="../scheduler.html">Scheduler</a>, but you can also pass in a Scheduler of your choosing as an
-      optional second parameter, in which case it will operate on that Scheduler instead.
+      There is no RxJS operator dedicated to wrap a single item like Just described here. However,
+      you can use the operator <code>of</code> giving one parameter, and this will have the same
+      effect as using Just. That should return an Observable that emits the single item as its
+      sole emission.
      </p>
      <h4>Sample Code</h4>
      <div class="code javascript"><pre>
-var source = Rx.Observable.just(42);
+var source = Rx.Observable.of(42);
 
 var subscription = source.subscribe(
-  function (x) { console.log('Next: %s', x); },
-  function (err) { console.log('Error: %s', err); },
-  function () { console.log('Completed'); });</pre></div><div class="output"><pre>
+  (x) => console.log('Next: %s', x),
+  (err) => console.log('Error: %s', err),
+  () => console.log('Completed')
+);</pre></div><div class="output"><pre>
 Next: 42
 Completed</pre></div>
-     <p>
-      <code>return</code>/<code>just</code> is found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
      </figcaption>
     </figure>
   {% endlang_operator %}
