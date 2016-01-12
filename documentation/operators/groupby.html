@@ -175,50 +175,46 @@ Observable.range(1,5)
     </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS groupBy groupByUntil %}
+  {% lang_operator RxJS groupBy %}
     <figure class="variant">
      <img src="images/groupBy.png" style="width:100%;" alt="groupBy" />
      <figcaption><p>
       RxJS implements <code>groupBy</code>. It takes one to three parameters:
      </p>
      <ol>
-      <li>(required) a function that accepts an item from the source Observable and returns its key</li>
-      <li>a function that accepts an item from the source Observable and returns an item to be emitted in its place by one of the resulting Observables</li>
-      <li>a function used to compare two keys for identity (that is, whether items with two keys should be emitted on the same Observable)</li>
+      <li>(required) a function that accepts an item from the source Observable and returns its key.</li>
+      <li>a function that accepts an item from the source Observable and returns an item to be emitted in its place by one of the resulting Observables.</li>
+      <li>a function used to determine the duration of existence of each group Observable. Takes a group Observable as input, and should return an Observable whose first emission determines the duration.</li>
      </ol>
      <h4>Sample Code</h4>
      <div class="code javascript"><pre>
 var codes = [
-    { keyCode: 38}, // up
-    { keyCode: 38}, // up
-    { keyCode: 40}, // down
-    { keyCode: 40}, // down
-    { keyCode: 37}, // left
-    { keyCode: 39}, // right
-    { keyCode: 37}, // left
-    { keyCode: 39}, // right
-    { keyCode: 66}, // b
-    { keyCode: 65}  // a
+  { keyCode: 38}, // up
+  { keyCode: 38}, // up
+  { keyCode: 40}, // down
+  { keyCode: 40}, // down
+  { keyCode: 37}, // left
+  { keyCode: 39}, // right
+  { keyCode: 37}, // left
+  { keyCode: 39}, // right
+  { keyCode: 66}, // b
+  { keyCode: 65}  // a
 ];
 
 var source = Rx.Observable.fromArray(codes)
-    .groupBy(
-        function (x) { return x.keyCode; },
-        function (x) { return x.keyCode; });
+  .groupBy(
+    x => x.keyCode,
+    x => x.keyCode
+  );
 
 var subscription = source.subscribe(
-    function (obs) {
-        // Print the count
-        obs.count().subscribe(function (x) {
-            console.log('Count: ' + x);
-        });
-    },
-    function (err) {
-        console.log('Error: ' + err);
-    },
-    function () {
-        console.log('Completed');
-    });</pre></div><div class="output"><pre>
+  obs => {
+    // Print the count
+    obs.count().subscribe(x => console.log('Count: ' + x));
+  },
+  err => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div><div class="output"><pre>
 Count: 2
 Count: 2
 Count: 2
@@ -226,61 +222,37 @@ Count: 2
 Count: 1
 Count: 1
 Completed</pre></div>
-     <p><code>groupBy</code> is found in each of the following distributions:</p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.coincidence.js</code></li>
-     </ul>
-     </figcaption>
-    </figure>
-    <figure class="variant">
-     <img src="images/groupByUntil.png" style="width:100%;" alt="groupByUntil" />
-     <figcaption><p>
-      RxJS also implements <code>groupByUntil</code>. It monitors an additional Observable, and
-      whenever that Observable emits an item, it closes any of the keyed Observables it has opened
-      (it will open new ones if additional items are emitted by the source Observable that match
-      the key). <code>groupByUntil</code> takes from two to four parameters:
-     </p>
-     <ol>
-      <li>(required) a function that accepts an item from the source Observable and returns its key</li>
-      <li>a function that accepts an item from the source Observable and returns an item to be emitted in its place by one of the resulting Observables</li>
-      <li>(required) a function that returns an Observable, the emissions from which trigger the termination of any open Observables</li>
-      <li>a function used to compare two keys for identity (that is, whether items with two keys should be emitted on the same Observable)</li>
-     </ol>
-     <h4>Sample Code</h4>
+     <h4>Sample Code with a duration selector function</h4>
      <div class="code javascript"><pre>
 var codes = [
-    { keyCode: 38}, // up
-    { keyCode: 38}, // up
-    { keyCode: 40}, // down
-    { keyCode: 40}, // down
-    { keyCode: 37}, // left
-    { keyCode: 39}, // right
-    { keyCode: 37}, // left
-    { keyCode: 39}, // right
-    { keyCode: 66}, // b
-    { keyCode: 65}  // a
+  { keyCode: 38}, // up
+  { keyCode: 38}, // up
+  { keyCode: 40}, // down
+  { keyCode: 40}, // down
+  { keyCode: 37}, // left
+  { keyCode: 39}, // right
+  { keyCode: 37}, // left
+  { keyCode: 39}, // right
+  { keyCode: 66}, // b
+  { keyCode: 65}  // a
 ];
 
-var source = Rx.Observable
-    .for(codes, function (x) { return Rx.Observable.return(x).delay(1000); })
-    .groupByUntil(
-        function (x) { return x.keyCode; },
-        function (x) { return x.keyCode; },
-        function (x) { return Rx.Observable.timer(2000); });
+var source = Rx.Observable.fromArray(codes)
+  .concatMap(x => Rx.Observable.of(x).delay(1000))
+  .groupBy(
+    (x) => x.keyCode,
+    (x) => x.keyCode,
+    (x) => Rx.Observable.timer(2000)
+  );
 
 var subscription = source.subscribe(
-    function (obs) {
-        // Print the count
-        obs.count().subscribe(function (x) { console.log('Count: ' + x); });
-    },
-    function (err) {
-        console.log('Error: ' + err);
-    },
-    function () {
-        console.log('Completed');
-    });</pre></div><div class="output"><pre>
+  obs => {
+    // Print the count
+    obs.count().subscribe(x => console.log('Count: ' + x));
+  },
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div><div class="output"><pre>
 Count: 2
 Count: 2
 Count: 1
@@ -290,12 +262,6 @@ Count: 1
 Count: 1
 Count: 1
 Completed</pre></div>
-     <p><code>groupByUntil</code> is found in each of the following distributions:</p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.coincidence.js</code></li>
-     </ul>
      </figcaption>
     </figure>
   {% endlang_operator %}
