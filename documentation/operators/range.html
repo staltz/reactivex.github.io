@@ -95,31 +95,24 @@ def myObservable = Observable.range(5, 3);</pre></div>
       RxJS implements this operator as <code>range</code>. It accepts as its parameters the
       start value of the range and the number of items in the range.
      </p><p>
-      <code>range</code> operates by default on the <code>currentThread</code>
-      <a href="../scheduler.html">Scheduler</a>, but there is a variant that allows you to set the Scheduler by
-      passing one in as the optional third parameter.
+      This operator also takes one additional optional parameter:
      </p>
+     <ol start="3">
+      <li>a <a href="../scheduler.html">Scheduler</a> on which this operator should operate</li>
+     </ol>
      <h4>Sample Code</h4>
      <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 3);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div><div class="output"><pre>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div><div class="output"><pre>
 Next: 0
 Next: 1
 Next: 2
 Completed</pre></div>
-     <p>
-      <code>range</code> is found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
      </figcaption>
     </figure>
   {% endlang_operator %}
