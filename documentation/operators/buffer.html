@@ -397,80 +397,63 @@ Observable&lt;List&lt;Integer&gt;&gt; burstyBuffered = burstyMulticast.buffer(bu
     </ul>
   {% endlang_operator %}
 
-  {% lang_operator RxJS buffer bufferWithCount bufferWithTime bufferWithTimeOrCount %}
+  {% lang_operator RxJS buffer bufferCount bufferTime bufferToggle bufferWhen %}
    <p>
-    RxJS has four <span class="operator">Buffer</span> operators &mdash; <code>buffer</code>,
-    <code>bufferWithCount</code>, <code>bufferWithTime</code>, and
-    <code>bufferWithTimeOrCount</code> &mdash; each of which has variants that have different
+    RxJS has five <span class="operator">Buffer</span> operators &mdash; <code>buffer</code>,
+    <code>bufferCount</code>, <code>bufferTime</code>, <code>bufferToggle</code> and
+    <code>bufferWhen</code> &mdash; each of which may have variants that have different
     ways of governing which source Observable items are emitted as part of which buffers.
    </p>
-   <h4><code>buffer(bufferBoundaries)</code></h4>
+   <h4><code>buffer(closingNotifier)</code></h4>
    <figure class="variant">
     <img src="images/buffer8.png" style="width:100%;" alt="buffer(bufferBoundaries)" />
     <figcaption>
-     <p><code>buffer(bufferBoundaries)</code> monitors an Observable,
-        <code>bufferBoundaries</code>. Each time that Observable emits an item, it creates a new
-        collection to begin collecting items emitted by the source Observable and emits the
-        previous collection.</p>
+     <p><code>buffer(closingNotifier)</code> closes the buffer whenever the monitored Observable
+        <code>closingNotifier</code> emits. When the buffer is closed, all previous emissions since
+        the last closing (or since the beginning of the observation) are collected in an array and
+        emitted on the result Observable.</p>
     </figcaption>
    </figure>
-   <h4><code>buffer(bufferClosingSelector)</code></h4>
+   <h4><code>bufferWhen(closingSelector)</code></h4>
    <figure class="variant">
-    <img src="images/buffer1.png" style="width:100%;" alt="buffer(bufferClosingSelector)" />
+    <img src="images/buffer1.png" style="width:100%;" alt="buffer(closingSelector)" />
     <figcaption>
-     <p>When it subscribes to the source Observable, <code>buffer(bufferClosingSelector)</code>
+     <p>When it subscribes to the source Observable, <code>bufferWhen(closingSelector)</code>
         begins to collect its emissions into a collection, and it also calls
-        <code>bufferClosingSelector</code> to generate a second Observable. When this second
-        Observable emits an item, <code>buffer</code> emits the current collection and repeats
-        this process: beginning a new collection and calling <code>bufferClosingSelector</code>
-        to create a new Observable to monitor. It will do this until the source Observable
-        terminates.</p>
+        the <code>closingSelector</code> function to generate a second Observable, the "closings"
+        Observable. When closings Observable emits an item, <code>bufferWhen</code> emits the
+        current collection and repeats this process: beginning a new collection and calling
+        <code>closingSelector</code> to create a new closings Observable to monitor. It will do
+        this until the source Observable terminates.</p>
     </figcaption>
    </figure>
-   <h4><code>buffer(bufferOpenings,bufferClosingSelector)</code></h4>
+   <h4><code>bufferToggle(openings, closingSelector)</code></h4>
    <figure class="variant">
-    <img src="images/buffer2.png" style="width:100%;" alt="buffer(bufferOpenings,bufferClosingSelector)" />
+    <img src="images/buffer2.png" style="width:100%;" alt="bufferToggle(openings, closingSelector)" />
     <figcaption>
-     <p><code>buffer(bufferOpenings,&#8239;bufferClosingSelector)</code> monitors an Observable,
-        <code>bufferOpenings</code>, that emits <code>BufferOpening</code> objects. Each time it
+     <p><code>buffer(openings,&#8239;closingSelector)</code> monitors an Observable,
+        <code>openings</code>, that emits <code>BufferOpening</code> objects. Each time it
         observes such an emitted item, it creates a new collection to begin collecting items
-        emitted by the source Observable and it passes the <code>bufferOpenings</code>
-        Observable into the <code>bufferClosingSelector</code> function. That function returns an
-        Observable. <code>buffer</code> monitors that Observable and when it detects an emitted
-        item from it, it emits the current collection and begins a new one.</p>
+        emitted by the source Observable and it passes the <code>openings</code>
+        Observable into the <code>closingSelector</code> function. That function returns a
+        closings Observable. <code>bufferToggle</code> monitors that Observable and when it
+        detects an emitted item from it, it emits the current collection and begins a new one.</p>
     </figcaption>
    </figure>
-   <p>
-    <code>buffer</code> is found in each of the following distributions:
-   </p>
-   <ul>
-    <li><code>rx.all.js</code></li>
-    <li><code>rx.all.compat.js</code></li>
-    <li><code>rx.coincidence.js</code></li>
-   </ul>
-   <p>
-    <code>buffer</code> requires one of the following distributions:
-   </p>
-   <ul>
-    <li><code>rx.js</code></li>
-    <li><code>rx.compat.js</code></li>
-    <li><code>rx.lite.js</code></li>
-    <li><code>rx.lite.compat.js</code></li>
-   </ul>
-   <h4><code>bufferWithCount(count)</code></h4>
+   <h4><code>bufferCount(count)</code></h4>
    <figure class="variant">
-    <img src="images/bufferWithCount3.png" style="width:100%;" alt="bufferWithCount(count)" />
+    <img src="images/bufferWithCount3.png" style="width:100%;" alt="bufferCount(count)" />
     <figcaption>
-     <p><code>bufferWithCount(count)</code> emits non-overlapping buffers, each of which contains
+     <p><code>bufferCount(count)</code> emits non-overlapping buffers, each of which contains
         at most <code>count</code> items from the source Observable (the final emitted buffer may
         contain fewer than <code>count</code> items).</p>
     </figcaption>
    </figure>
-   <h4><code>bufferWithCount(count, skip)</code></h4>
+   <h4><code>bufferCount(count, skip)</code></h4>
    <figure class="variant">
-    <img src="images/bufferWithCount4.png" style="width:100%;" alt="bufferWithCount(count,skip)" />
+    <img src="images/bufferWithCount4.png" style="width:100%;" alt="bufferCount(count,skip)" />
     <figcaption>
-     <p><code>bufferWithCount(count,&#8239;skip)</code> creates a new buffer starting with the
+     <p><code>bufferCount(count,&#8239;skip)</code> creates a new buffer starting with the
         first emitted item from the source Observable, and a new one for every <code>skip</code>
         items thereafter, and fills each buffer with <code>count</code> items: the initial item
         and <code>count-1</code> subsequent ones, emitting each buffer when it is complete.
@@ -479,33 +462,23 @@ Observable&lt;List&lt;Integer&gt;&gt; burstyBuffered = burstyMulticast.buffer(bu
         emitted by the source Observable are not represented in any buffer).</p>
     </figcaption>
    </figure>
-   <p>
-    <code>bufferWithCount</code> is found in each of the following distributions:
-   </p>
-   <ul>
-    <li><code>rx.js</code></li>
-    <li><code>rx.compat.js</code></li>
-    <li><code>rx.all.js</code></li>
-    <li><code>rx.all.compat.js</code></li>
-    <li><code>rx.lite.extras.js</code></li>
-   </ul>
-   <h4><code>bufferWithTime(timeSpan)</code></h4>
+   <h4><code>bufferTime(timeSpan)</code></h4>
    <figure class="variant">
-    <img src="images/bufferWithTime5.png" style="width:100%;" alt="bufferWithTime(timeSpan)" />
+    <img src="images/bufferWithTime5.png" style="width:100%;" alt="bufferTime(timeSpan)" />
     <figcaption>
-     <p><code>bufferWithTime(timeSpan)</code> emits a new collection of items periodically, every
+     <p><code>bufferTime(timeSpan)</code> emits a new collection of items periodically, every
         <code>timeSpan</code> milliseconds, containing all items emitted by the source Observable
         since the previous bundle emission or, in the case of the first bundle, since the
         subscription to the source Observable. There is also a version of this variant of the
         operator that takes a <a href="../scheduler.html"><code>Scheduler</code></a> as a parameter and uses it
-        to govern the timespan; by default this variant uses the <code>timeout</code> scheduler.</p>
+        to govern the timespan; by default this variant uses the <code>asap</code> scheduler.</p>
     </figcaption>
    </figure>
-   <h4><code>bufferWithTime(timeSpan, timeShift)</code></h4>
+   <h4><code>bufferTime(timeSpan, timeShift)</code></h4>
    <figure class="variant">
-    <img src="images/bufferWithTime7.png" style="width:100%;" alt="bufferWithTime(timeSpan,timeShift)" />
+    <img src="images/bufferWithTime7.png" style="width:100%;" alt="bufferTime(timeSpan,timeShift)" />
     <figcaption>
-     <p><code>bufferWithTime(timeSpan,&#8239;timeShift)</code> creates a new collection of items
+     <p><code>bufferTime(timeSpan,&#8239;timeShift)</code> creates a new collection of items
         every <code>timeShift</code> milliseconds, and fills this bundle with every item emitted
         by the source Observable from that time until <code>timeSpan</code> milliseconds has
         passed since the collection&#8217;s creation, before emitting this collection as its own
@@ -513,39 +486,9 @@ Observable&lt;List&lt;Integer&gt;&gt; burstyBuffered = burstyMulticast.buffer(bu
         bundles will represent time periods that overlap and so they may contain duplicate items.
         There is also a version of this variant of the operator that takes a
         <a href="../scheduler.html"><code>Scheduler</code></a> as a parameter and uses it to govern the
-        timespan; by default this variant uses the <code>timeout</code> scheduler.</p>
+        timespan; by default this variant uses the <code>asap</code> scheduler.</p>
     </figcaption>
    </figure>
-   <h4><code>bufferWithTimeOrCount(timeSpan, count)</code></h4>
-   <figure class="variant">
-    <img src="images/bufferWithTimeOrCount6.png" style="width:100%;" alt="bufferWithTimeOrCount(timeSpan,count)" />
-    <figcaption>
-     <p><code>bufferWithTimeOrCount(timeSpan,&#8239;count)</code> emits a new collection of items
-        for every <code>count</code> items emitted by the source Observable, or, if
-        <code>timeSpan</code> milliseconds have elapsed since its last collection emission, it
-        emits a collection of however many items the source Observable has emitted in that span,
-        even if this is fewer than <code>count</code>. There is also a version of this variant of
-        the operator that takes a <a href="../scheduler.html"><code>Scheduler</code></a> as a parameter and uses
-        it to govern the timespan; by default this variant uses the <code>timeout</code> scheduler.</p>
-    </figcaption>
-   </figure>
-   <p>
-    <code>bufferWithTime</code> and <code>bufferWithTimeOrCount</code> are found in each of the
-    following distributions:
-   </p>
-   <ul>
-    <li><code>rx.all.js</code></li>
-    <li><code>rx.all.compat.js</code></li>
-    <li><code>rx.time.js</code></li>
-   </ul>
-   <p>
-    <code>bufferWithTime</code> and <code>bufferWithTimeOrCount</code> require one of the
-    following distributions:
-   </p>
-   <ul>
-    <li><code>rx.time.js</code> requires <code>rx.js</code> or <code>rx.compat.js</code></li>
-    <li>otherwise: <code>rx.lite.js</code> or <code>rx.lite.compat.js</code></li>
-   </ul>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin buffer %}
