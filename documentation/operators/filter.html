@@ -147,54 +147,38 @@ Sequence complete.</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS filter where %}
-     <figure>
+  {% lang_operator RxJS filter %}
+    <figure>
       <img src="images/filter.png" style="width:100%;" alt="filter" />
       <figcaption><p>
-       RxJS implements this operator under two names, but with identical behavior: <code>filter</code> and
-       <code>where</code>. This operator takes two parameters: the predicate function, and an optional object
+       This operator takes two parameters: the predicate function, and an optional object
        that will represent that function&#8217;s &ldquo;<code>this</code>&rdquo; context when it executes.
       </p><p>
-       The predicate function itself takes three arguments:
+       The predicate function itself takes two arguments:
       </p>
       <ol>
        <li>the item from the source Observable to be, or not be, filtered</li>
        <li>the zero-based index of this item in the source Observable&#8217;s sequence</li>
-       <li>the source Observable object</li>
       </ol>
       <p>
-       Write the predicate function so that it returns <code>true</code> for those items you want to pass
-       through the filter to the next observer, and <code>false</code> for those items you want the filter to
-       block and suppress.
+       Write the predicate function so that it returns <code>true</code> for those items you want to pass through the filter to the next observer, and <code>false</code> for those items you want the filter to block and suppress.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 5)
-  .filter(function (x, idx, obs) {
-    return x % 2 === 0;
-  });
+  .filter((x, idx) => x % 2 === 0);
 
 var subscription = source.subscribe(
-  function (x) { console.log('Next: %s', x); },
-  function (err) { console.log('Error: %s', err); },
-  function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: %s', x),
+  (err) => console.log('Error: %s', err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 0
 Next: 2
 Next: 4
 Completed</pre></div></figcaption>
-     </figure>
-     <p>
-      <code>filter</code> and <code>where</code> are found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
+    </figure>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin filter ofType %}
