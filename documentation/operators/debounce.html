@@ -131,104 +131,67 @@ id: debounce
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS debounce debounceWithSelector throttleWithTimeout %}
-     <figure>
-      <img src="images/debounce.png" style="width:100%;" alt="debounce" />
-      <figcaption><p>
-       The first variant &mdash; called either <code>debounce</code> or <code>throttleWithTimeout</code> &mdash;
-       accepts as its parameter a duration, defined as an integer number of milliseconds, and it suppresses any
-       emitted items that are followed by other emitted items during that duration since the first item&#8217;s
-       emission.
-      </p>
-      <h4>Sample Code</h4>
-      <div class="code javascript"><pre>
-var times = [
-    { value: 0, time: 100 },
-    { value: 1, time: 600 },
-    { value: 2, time: 400 },
-    { value: 3, time: 700 },
-    { value: 4, time: 200 }
-];
-
-// Delay each item by time and project value;
-var source = Rx.Observable.from(times)
-  .flatMap(function (item) {
-    return Rx.Observable
-      .of(item.value)
-      .delay(item.time);
-  })
-  .debounce(500 /* ms */);
-
-var subscription = source.subscribe(
-  function (x) {
-    console.log('Next: %s', x);
-  },
-  function (err) {
-    console.log('Error: %s', err);
-  },
-  function () {
-    console.log('Completed');
-  });</pre></div>
-      <div class="output"><pre>
-Next: 0
-Next: 2
-Next: 4
-Completed</pre></div>
+  {% lang_operator RxJS debounce debounceTime %}
+    <p>
+      RxJS has two variants of <span class="operator">Window</span> &mdash; <code>debounce</code> and <code>debounceTime</code>.
+    </p>
+    <h4><code>debounce(durationSelector)</code></h4>
+    <figure>
+      <img src="images/debounceWithSelector.png" style="width:100%;" alt="debounce(durationSelector)" />
+      <figcaption>
+        <p>
+          For each item on the source Observable, <code>debounce(durationSelector)</code> calls the <code>durationSelector</code> function to determine the debounce duration for that item. If any source item is emitted before the duration Observable emits, a new debounce duration Observable is created using <code>durationSelector</code>, repeating the process. After the duration Observable emits, the latest source item will be emitted on the result Observable.
+        </p>
       </figcaption>
-     </figure>
-     <figure>
-      <img src="images/debounceWithSelector.png" style="width:100%;" alt="debounceWithSelector" />
-      <figcaption><p>
-       The <code>debounceWithSelector</code> operator throttles the source Observable by applying a function to
-       each item it emits, this function generating an Observable. If the source Observable emits another item
-       before this newly-generated Observable terminates, <code>debounce</code> will suppress the item.
-      </p>
-      <h4>Sample Code</h4>
-      <div class="code javascript"><pre>
-var array = [
-    800,
-    700,
-    600,
-    500
-];
-
-var source = Rx.Observable.for(
-    array,
-    function (x) {
-        return Rx.Observable.timer(x)
-    })
-    .map(function(x, i) { return i; })
-    .throttleWithSelector(function (x) {
-        return Rx.Observable.timer(700);
-    });
+    </figure>
+    <h4>Sample Code</h4>
+    <div class="code javascript"><pre>
+var source = Rx.Observable
+  .interval(100)
+  .take(10)
+  .debounce(i =>
+    Rx.Observable.interval(i % 2 ? 50 : 150).first()
+  );
 
 var subscription = source.subscribe(
-    function (x) {
-        console.log('Next: ' + x);
-    },
-    function (err) {
-        console.log('Error: ' + err);
-    },
-    function () {
-        console.log('Completed');
-    });</pre></div>
-      <div class="output"><pre>
-Next: 0
+  (x) => console.log('Next: %s', x),
+  (err) => console.log('Error: %s', err),
+  () => console.log('Completed')
+);</pre></div>
+    <div class="output"><pre>
+Next: 1
 Next: 3
+Next: 5
+Next: 7
+Next: 9
+Completed
+</pre></div>
+    <h4><code>debounceTime(dueTime)</code></h4>
+    <figure>
+      <img src="images/debounce.png" style="width:100%;" alt="debounce(dueTime)" />
+      <figcaption><p>
+        For each item on the source Observable, <code>debounceTime(dueTime)</code> waits for <code>dueTime</code> milliseconds of "event silence" (no items emitted on the source) to emit that item on the result Observable. This operator may also take an optional <a href="../scheduler.html"><code>Scheduler</code></a> as a parameter and uses it to govern the dueTime; by default this variant uses the <code>asap</code> scheduler.</p>
+      </p>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+var source = Rx.Observable
+  .interval(100)
+  .take(10)
+  .filter(i => i % 3 !== 0)
+  .debounceTime(200);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: %s', x),
+  (err) => console.log('Error: %s', err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: 2
+Next: 5
+Next: 8
 Completed</pre></div>
       </figcaption>
-     </figure>
-     <p>
-      <code>debounce</code> and <code>debounceWithSelector</code> are found in each of the following
-      distributions:
-     </p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
+    </figure>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin debounce throttleWithTimeout %}
