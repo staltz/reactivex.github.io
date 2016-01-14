@@ -574,13 +574,11 @@ Sequence complete.</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS find findIndex first single %}
+  {% lang_operator RxJS first single find findIndex %}
      <figure>
       <img src="images/firstN.png" style="width:100%;" alt="first" />
       <figcaption><p>
-       RxJS implements the <code>first</code> operator. It optionally takes a predicate function as a parameter,
-       in which case, rather than emitting the first item from the source Observable, the resulting Observable
-       will emit the first item from the source Observable that satisfies the predicate.
+       RxJS implements the <code>first</code> operator. It optionally takes a predicate function as a parameter, in which case, rather than emitting the first item from the source Observable, the resulting Observable will emit the first item from the source Observable that satisfies the predicate.
       </p><p>
        The predicate function itself takes three arguments:
       </p>
@@ -590,60 +588,63 @@ Sequence complete.</pre></div>
        <li>the source Observable object</li>
       </ol>
       <p>
-       An optional third parameter (named <code>defaultValue</code>) allows you to choose an item
-       that <code>first</code> will emit if the source Observable does not emit any items (or if
-       it does not emit the <i>n</i><sup>th</sup> item that it expected.
+        <code>first</code> accepts an optional second parameter as a transformative function takes in items emitted in the source Observable, transforming them for the result Observable. An optional third parameter (named <code>defaultValue</code>) allows you to choose an item
+        that <code>first</code> will emit if the source Observable does not emit any items (or if
+        it does not emit the <i>n</i><sup>th</sup> item that it expected.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 10)
-    .first(function (x, idx, obs) { return x % 2 === 1; });
+  .first((x, idx, obs) => x % 2 === 1);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 1
 Completed</pre></div>
       <p>
-       If the source Observable emits no items (or no items that match the predicate), <code>first</code>
-       will terminate with a &ldquo;<code>Sequence contains no elements.</code>&rdquo; <code>onError</code>
-       notification.
+       If the source Observable emits no items (or no items that match the predicate), <code>first</code> will terminate with a &ldquo;<code>EmptyError</code>&rdquo; <code>error</code> notification.
       </p>
       </figcaption>
      </figure>
      <figure>
       <img src="images/single.p.png" style="width:100%;" alt="single" />
       <figcaption><p>
-       The <code>single</code> operator is similar, except that it only emits its item once the source
-       Observable successfully completes after emitting one item (or one item that matches the predicate). If it
-       emits either no such items or more than one such item, <code>single</code> will terminate with an
-       <code>onError</code> notitifcation (&ldquo;<code>Sequence contains no elements.</code>&rdquo;).
+       The <code>single</code> operator is similar, except that it only emits its item once the source Observable successfully completes after emitting one item (or one item that matches the predicate). If it emits either no such items or more than one such item, <code>single</code> will terminate with an <code>error</code> notification (&ldquo;<code>EmptyError</code>&rdquo;).
       </p>
+      <p>
+        It optionally takes a predicate function as a parameter, in which case, rather than emitting the first item from the source Observable, the resulting Observable will emit the first item from the source Observable that satisfies the predicate.
+      </p><p>
+        The predicate function itself takes three arguments:
+      </p>
+      <ol>
+        <li>the item from the source Observable to be, or not be, filtered</li>
+        <li>the zero-based index of this item in the source Observable&#8217;s sequence</li>
+        <li>the source Observable object</li>
+      </ol>
       </figcaption>
      </figure>
      <figure>
       <img src="images/find.png" style="width:100%;" alt="find" />
       <figcaption><p>
-       The <code>find</code> operator is much like <code>first</code> except that the predicate argument is
-       mandatory, and it behaves differently if no item from the source Observable matches the predicate.
-       While <code>first</code> will send an <code>onError</code> notification in such a case, <code>find</code>
-       will instead emit an <code>undefined</code> item.
+       The <code>find</code> operator is much like <code>first</code> except that the predicate argument is mandatory, and it behaves differently if no item from the source Observable matches the predicate. While <code>first</code> will send an <code>error</code> notification in such a case, <code>find</code> will instead emit an <code>undefined</code> item.
+      </p>
+      <p>
+        It may take an optional object that will represent that function&#8217;s &ldquo;<code>this</code>&rdquo; context when it executes.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
-var array = [1,2,3,4];
-
-var source = Rx.Observable.fromArray(array)
-    .find(function (x, i, obs) {
-        return x === 5;
-    });
+var source = Rx.Observable.fromArray([1, 2, 3, 4])
+  .find((x, i, obs) => x === 5);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: undefined
 Completed</pre></div>
@@ -651,48 +652,25 @@ Completed</pre></div>
      </figure>
      <figure>
       <img src="images/findIndex.png" style="width:100%;" alt="findIndex" />
-      <figcaption><p>
+      <figcaption>
       <p>
-       The <code>findIndex</code> operator is similar to <code>find</code>, except that instead of emitting
-       the item that matches the predicate (or <code>undefined</code>), it emits the zero-based index of that
-       item in the source Observable&#8217;s sequence (or <code>-1</code>).
+       The <code>findIndex</code> operator is similar to <code>find</code>, except that instead of emitting the item that matches the predicate (or <code>undefined</code>), it emits the zero-based index of that item in the source Observable&#8217;s sequence (or <code>-1</code>).
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
-var array = [1,2,3,4];
-
-var source = Rx.Observable.fromArray(array)
-    .findIndex(function (x, i, obs) {
-        return x === 5;
-    });
+var source = Rx.Observable.fromArray([1, 2, 3, 4])
+  .findIndex((x, i, obs) => x === 5);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: -1
 Completed</pre></div>
       </figcaption>
      </figure>
-     <p>
-      <code>find</code>, <code>findIndex</code>, and <code>first</code> are found
-      in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.aggregates.js</code></li>
-     </ul>
-     <p>
-      They each require one of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin first firstOrDefault mostRecent single singleOrDefault takeFirst %}
