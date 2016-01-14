@@ -124,60 +124,42 @@ id: elementAt
      <figure>
       <img src="images/elementAt.png" style="width:100%;" alt="elementAt" />
       <figcaption><p>
-       RxJS implements this operator as <code>elementAt</code>. Pass <code>elementAt</code> a zero-based
-       index value and it will emit the solitary item from the source Observable&#8217;s sequence that matches
-       that index value (for example, if you pass the index value 5, <code>elementAt</code> will emit the sixth
+       RxJS implements this operator as <code>elementAt</code>. Pass <code>elementAt</code> a zero-based index value and it will emit the solitary item from the source Observable&#8217;s sequence that matches that index value (for example, if you pass the index value 5, <code>elementAt</code> will emit the sixth
        item emitted by the source Observable).
       </p><p>
-       If there is no element in the source sequence with the index value you specify, <code>elementAt</code>
-       will issue an <code>onError</code> notification: &ldquo;<code>Argument out of range</code>&rdquo;
+       If there is no element in the source sequence with the index value you specify, <code>elementAt</code> will issue an <code>error</code> notification: &ldquo;<code>ArgumentOutOfRangeError</code>&rdquo;
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
-var source = Rx.Observable.fromArray([1,2,3,4])
+var source = Rx.Observable.fromArray([1, 2, 3, 4])
     .elementAt(1);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 2
 Completed</pre></div>
        <p>
         You may optionally pass in a default value that <code>elementAt</code> will emit if the
-        source Observable emits no values:
+        source Observable emits instead of <code>ArgumentOutOfRangeError</code>:
        </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.fromArray([])
-    .element({defaultValue: 23});
+    .elementAt(1, 23);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 23
 Completed</pre></div></figcaption>
      </figure>
-     <p>
-      <code>elementAt</code> is found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.aggregates.js</code></li>
-     </ul>
-     <p>
-      They require one of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin elementAt elementAtOrDefault %}
