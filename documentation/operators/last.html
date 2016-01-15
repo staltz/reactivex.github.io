@@ -303,9 +303,7 @@ Sequence complete.</pre></div>
      <figure>
       <img src="images/last.p.png" style="width:100%;" alt="last" />
       <figcaption><p>
-       RxJS implements the <code>last</code> operator. It optionally takes a predicate function as a parameter,
-       in which case, rather than emitting the last item from the source Observable, the resulting Observable
-       will emit the last item from the source Observable that satisfies the predicate.
+       RxJS implements the <code>last</code> operator. It optionally takes a predicate function as a parameter, in which case, rather than emitting the last item from the source Observable, the resulting Observable will emit the last item from the source Observable that satisfies the predicate.
       </p><p>
        The predicate function itself takes three arguments:
       </p>
@@ -314,57 +312,42 @@ Sequence complete.</pre></div>
        <li>the zero-based index of this item in the source Observable&#8217;s sequence</li>
        <li>the source Observable object</li>
       </ol>
-      <h4>Sample Code</h4>
-      <div class="code javascript"><pre>
-var source = Rx.Observable.range(0, 10)
-    .last(function (x, idx, obs) { return x % 2 === 1; });
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-      <div class="output"><pre>
-Next: 8
-Completed</pre></div>
       <p>
-       If the source Observable emits no items (or no items that match the predicate), <code>last</code>
-       will terminate with a &ldquo;<code>Sequence contains no elements.</code>&rdquo; <code>onError</code>
-       notification.
-      </p><p>
-       If instead you want the Observable to emit a default value in such a case, you can pass a
-       second parameter (named <code>defaultValue</code>) to <code>last</code>:
+        <code>last</code> accepts an optional second parameter (named <code>resultSelector</code>) as a transformative function takes in items emitted in the source Observable, transforming them for the result Observable. An optional third parameter (named <code>defaultValue</code>) allows you to choose an item that <code>last</code> will emit if the source Observable does not emit any items (or if it does not emit the <i>n</i><sup>th</sup> item that it expected.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 10)
-    .last(function (x, idx, obs) { return x > 42; }, 88 );
+  .last((x, idx, obs) => x % 2 === 0);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: 8
+Completed</pre></div>
+      <p>
+       If the source Observable emits no items (or no items that match the predicate), <code>last</code> will terminate with a &ldquo;<code>EmptyError</code>&rdquo; <code>error</code> notification.
+      </p><p>
+       If instead you want the Observable to emit a default value in such a case, you can pass it as the third parameter (named <code>defaultValue</code>) to <code>last</code>:
+      </p>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+var source = Rx.Observable.range(0, 10)
+    .last((x, idx, obs) => x > 42, null, 88);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 88
 Completed
 </pre></div></figcaption>
      </figure>
-     <p>
-      <code>last</code> is found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.aggregates.js</code></li>
-     </ul>
-     <p>
-      It requires one of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin last lastOrDefault takeLast %}
