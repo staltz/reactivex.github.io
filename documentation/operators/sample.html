@@ -207,105 +207,121 @@ Sequence complete</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS sample throttleFirst %}
-     <p>
-      RxJS implements this operator with two variants of <code>sample</code>.
-     </p>
-     <figure>
+  {% lang_operator RxJS sample sampleTime throttle throttleTime %}
+    <p>
+      RxJS implements this operator with two variants: <code>sample</code> and <code>sampleTime</code>.
+    </p>
+    <figure>
+      <img src="images/sample.o.png" style="width:100%;" alt="sample" />
+      <figcaption>
+        <p>
+          <code>sample</code> accepts as its parameter an Observable, and it samples the source Observable whenever this second Observable emits an item.
+        </p>
+        <h4>Sample Code</h4>
+        <div class="code javascript"><pre>
+var source = Rx.Observable.interval(1000)
+  .sample(Rx.Observable.interval(5000))
+  .take(2);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+        <div class="output"><pre>
+Next: 3
+Next: 8
+Completed</pre></div>
+      </figcaption>
+    </figure>
+    <figure>
       <img src="images/sample.png" style="width:100%;" alt="sample" />
       <figcaption><p>
-       The first variant accepts as its parameter a periodicity, defined as an integer number of milliseconds,
-       and it samples the source Observable periodically at that frequency.
+        <code>sampleTime</code> accepts as its parameter a periodicity, defined as an integer number of milliseconds, and it samples the source Observable periodically at that frequency. There is also a version of this variant of the operator that takes a <a href="../scheduler.html"><code>Scheduler</code></a> as a parameter and uses it to govern the delay; by default this variant uses the <code>asap</code> scheduler.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.interval(1000)
-    .sample(5000)
-    .take(2);
+  .sampleTime(5000)
+  .take(2);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 3
 Next: 8
 Completed</pre></div>
       </figcaption>
-     </figure>
-     <figure>
-      <img src="images/sample.o.png" style="width:100%;" alt="sample" />
+    </figure>
+    <figure>
+      <!-- <img src="images/throttleFirst.png" style="width:100%;" alt="throttleFirst" /> -->
       <figcaption><p>
-       The second variant accepts as its parameter an Observable, and it samples the source Observable whenever
-       this second Observable emits an item.
-      </p>
-      <h4>Sample Code</h4>
-      <div class="code javascript"><pre>
-var source = Rx.Observable.interval(1000)
-    .sample(Rx.Observable.interval(5000))
-    .take(2);
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-      <div class="output"><pre>
-Next: 3
-Next: 8
-Completed</pre></div>
-      </figcaption>
-     </figure>
-     <figure>
-      <img src="images/throttleFirst.png" style="width:100%;" alt="throttleFirst" />
-      <figcaption><p>
-       There is also a <code>throttleFirst</code> operator, which differs from <code>sample</code> in that it
-       emits the <em>first</em> item emitted by the source Observable in each sampling period rather than the
-       <em>most recently emitted</em> item.
-      </p><p>
-       It does not have the variant that uses the emissions from a second Observable to regulate the sampling
-       periodicity.
+       There is also a <code>throttle</code> operator, which differs from <code>sample</code> in that it emits the <em>first</em> item emitted by the source Observable on each sampling period rather than the <em>most recently emitted</em> item. Also, it takes a <code>durationSelector</code> function as parameter. That function is supposed to return the notifier Observable.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var times = [
-    { value: 0, time: 100 },
-    { value: 1, time: 600 },
-    { value: 2, time: 400 },
-    { value: 3, time: 900 },
-    { value: 4, time: 200 }
+  { value: 0, time: 100 },
+  { value: 1, time: 600 },
+  { value: 2, time: 400 },
+  { value: 3, time: 900 },
+  { value: 4, time: 200 }
 ];
 
 // Delay each item by time and project value;
 var source = Rx.Observable.from(times)
-  .flatMap(function (item) {
-    return Rx.Observable
-      .of(item.value)
-      .delay(item.time);
-  })
-  .throttleFirst(300 /* ms */);
+  .flatMap((item) =>
+    Rx.Observable.of(item.value).delay(item.time)
+  )
+  .throttle(() => Rx.Observable.interval(300 /* ms */));
 
 var subscription = source.subscribe(
-  function (x) { console.log('Next: %s', x); },
-  function (err) { console.log('Error: %s', err); },
-  function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 0
-Next: 2
-Next: 3
+Next: 1
 Completed</pre></div>
       </figcaption>
-     </figure>
-     <p>
-      <code>sample</code> and <code>throttleFirst</code> operate by default on the <code>timeout</code>
-      <a href="../scheduler.html">Scheduler</a>. They are found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
+    </figure>
+    <figure>
+      <img src="images/throttleFirst.png" style="width:100%;" alt="throttleFirst" />
+      <figcaption><p>
+        <code>throttleTime</code> accepts as its parameter a periodicity, defined as an integer number of milliseconds, and it emits the first item of the source Observable in each period time window. There is also a version of this operator that takes a <a href="../scheduler.html"><code>Scheduler</code></a> as a parameter and uses it to govern the delay; by default this variant uses the <code>asap</code> scheduler.
+      </p>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+var times = [
+  { value: 0, time: 100 },
+  { value: 1, time: 600 },
+  { value: 2, time: 400 },
+  { value: 3, time: 900 },
+  { value: 4, time: 200 }
+];
+
+// Delay each item by time and project value;
+var source = Rx.Observable.from(times)
+  .flatMap((item) =>
+    Rx.Observable.of(item.value).delay(item.time)
+  )
+  .throttleTime(300 /* ms */);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: 0
+Next: 1
+Completed</pre></div>
+      </figcaption>
+    </figure>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin sample throttleFirst throttleLast %}
