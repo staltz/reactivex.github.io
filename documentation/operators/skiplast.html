@@ -126,85 +126,10 @@ id: skipLast
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS skipLast skipLastWithTime %}
-     <figure>
-      <img src="images/skipLast.png" style="width:100%;" alt="skipLast" />
-      <figcaption><p>
-       You can ignore the final <i>n</i> items emitted by an Observable and attend only to those items that
-       precede them, by modifying the Observable with the <code>skipLast(<i>n</i>)</code> operator. Note that
-       the mechanism by which this is implemented will delay the emission of any item from the source Observable
-       until <i>n</i> additional items have been emitted by that Observable.
-      </p>
-      <h4>Sample Code</h4>
-      <div class="code javascript"><pre>
-var source = Rx.Observable.range(0, 5)
-    .skipLast(3);
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-      <div class="output"><pre>
-Next: 0
-Next: 1
-Completed</pre></div>
-      <p>
-       <code>skipLast</code> is found in each of the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
-      </figcaption>
-     </figure>
-     <figure>
-      <img src="images/skipLastWithTime.png" style="width:100%;" alt="skipLastWithTime" />
-      <figcaption><p>
-       The <code>skipLastWithTime</code> operator takes a temporal duration rather than a quantity of
-       items. It drops those items that are emitted during that final duration of the source
-       Observable&#8217;s lifespan. You set this duration by passing in a number of milliseconds as a parameter
-       to <code>skipLastWithTime</code>.
-      </p><p>
-       Note that the mechanism by which this is implemented will delay the emission of any item from the source
-       Observable until the given duration passes since its emission.
-      </p><p>
-       <code>skipLastWithTime</code> by default operates on the <code>timeout</code>
-       <a href="../scheduler.html">Scheduler</a>, but you may also pass in a Scheduler of your choosing as an
-       optional second parameter.
-      </p>
-      <h4>Sample Code</h4>
-      <div class="code javascript"><pre>
-var source = Rx.Observable.timer(0, 1000)
-    .take(10)
-    .skipLastWithTime(5000);
-
-var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
-      <div class="output"><pre>
-Next: 0
-Next: 1
-Next: 2
-Next: 3
-Next: 4
-Completed</pre></div>
-      <p>
-       <code>skipLastWithTime</code> is found in each of the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
-      </figcaption>
-     </figure>
+  {% lang_operator RxJS %}
+    <p>
+     <span style="color:#ff0000">TBD</span>
+    </p>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin skipLast %}
