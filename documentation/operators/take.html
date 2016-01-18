@@ -166,8 +166,13 @@ Sequence complete.</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS take takeUntilWithTime %}
-     <figure>
+  {% lang_operator RxJS take takeUntil takeWhile %}
+    <p>
+      RxJS has three <span class="operator">Take</span> operators &mdash; <code>take</code>,
+      <code>takeUntil</code>, <code>takeWhile</code>.
+    </p>
+    <h4><code>take(count)</code></h4>
+    <figure>
       <img src="images/take.png" style="width:100%;" alt="take" />
       <figcaption><p>
        RxJS implements the <code>take</code> operator.
@@ -175,67 +180,36 @@ Sequence complete.</pre></div>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 5)
-    .take(3);
+  .take(3);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 0
 Next: 1
 Next: 2
 Completed</pre></div>
       </figcaption>
-     </figure>
-     <figure>
-      <img src="images/take.0.png" style="width:100%;" alt="take" />
+    </figure>
+    <h4><code>takeUntil(notifier)</code></h4>
+    <figure>
+      <img src="images/takeUntil.png" style="width:100%;" alt="takeUntil" />
       <figcaption><p>
-       For the special case of <code>take(0)</code> you can also pass as a second parameter a
-       <a href="../scheduler.html">Scheduler</a> that <code>take</code> will use to immediately schedule a call
-       to <code>onCompleted</code>.
-      </p>
-      </figcaption>
-     </figure>
-     <p>
-      <code>take</code> is found in each of the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
-     <figure>
-      <img src="images/takeUntilWithTime.png" style="width:100%;" alt="takeUntilWithTime" />
-      <figcaption><p>
-       RxJS also implements a <code>takeUntilWithTime</code> operator, which is like <code>take</code>
-       except that rather than taking a particular quantity of items, it takes all of the items that are
-       emitted during an initial period of time. You establish this period of by passing in a parameter to
-       <code>takeUntilWithTime</code>, in either of these formats:
-      </p>
-      <dl>
-       <dt>a number</dt>
-        <dd>mirrors items from the source Observable until this many milliseconds have passed since the Observable was subscribed to</dd>
-       <dt>a <code>Date</code></dt>
-        <dd>mirrors items from the source Observable until this absolute time</dd>
-      </dl>
-      <p>
-       You may also, optionally, pass in a <a href="../scheduler.html">Scheduler</a> as a second parameter, and
-       the timer will operate on that Scheduler (<code>takeUntilWithTime</code> uses the <code>timeout</code>
-       Scheduler by default).
+       RxJS also implements a <code>takeUntil</code> operator that takes a <code>notifier</code> Observable as argument, and takes items only until the notifier emits a value.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.timer(0, 1000)
-    .takeUntilWithTime(5000);
+  .takeUntil(Rx.Observable.timer(5000));
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 0
 Next: 1
@@ -243,18 +217,31 @@ Next: 2
 Next: 3
 Next: 4
 Completed</pre></div>
-      <p>
-       <code>takeUntilWithTime</code> is found in each of the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
       </figcaption>
-     </figure>
+    </figure>
+    <h4><code>takeWhile(predicate)</code></h4>
+    <figure>
+      <img src="images/takeWhile.png" style="width:100%;" alt="takeWhile" />
+      <figcaption><p>
+        The <code>takeWhile</code> operator takes a <code>predicate</code> as argument, and takes items only while the predicate is satisfied for each item. When the source emits the first item that does not satisfy the predicate, the result Observable completes.
+      </p>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+var source = Rx.Observable.range(0, 5)
+  .takeWhile(i => i < 3);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: 0
+Next: 1
+Next: 2
+Completed</pre></div>
+      </figcaption>
+    </figure>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin take %}
