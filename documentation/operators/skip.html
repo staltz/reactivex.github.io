@@ -131,8 +131,13 @@ Sequence complete</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS skip skipUntilWithTime %}
-     <figure>
+  {% lang_operator RxJS skip skipUntil skipWhile %}
+    <p>
+      RxJS has three <span class="operator">Skip</span> operators &mdash; <code>skip</code>,
+      <code>skipUntil</code>, <code>skipWhile</code>.
+    </p>
+    <h4><code>skip(count)</code></h4>
+    <figure>
       <img src="images/skip.png" style="width:100%;" alt="skip" />
       <figcaption><p>
        RxJS implements the <code>skip</code> operator.
@@ -140,71 +145,65 @@ Sequence complete</pre></div>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 5)
-    .skip(3);
+  .skip(3);
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
 Next: 3
 Next: 4
 Completed</pre></div>
-      <p>
-       <code>skip</code> is found in each of the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
       </figcaption>
-     </figure>
-     <figure>
-      <img src="images/skipUntilWithTime.png" style="width:100%;" alt="skipUntilWithTime" />
+    </figure>
+    <h4><code>skipUntil(notifier)</code></h4>
+    <figure>
+      <img src="images/skipUntil.png" style="width:100%;" alt="skipUntil" />
       <figcaption><p>
-       RxJS also implements a <code>skipUntilWithTime</code> operator that does not skip a particular quantity
-       of items from the source Observable, but skips items based on chronology. You set this skip period by
-       passing in a parameter to <code>skipUntilWithTime</code>, in either of these formats:
-      </p>
-      <dl>
-       <dt>a number</dt>
-        <dd>skips items from the source Observable until this many milliseconds have passed since the Observable was subscribed to</dd>
-       <dt>a <code>Date</code></dt>
-        <dd>skips items from the source Observable until this absolute time</dd>
-      </dl>
-      <p>
-       You may also, optionally, pass in a <a href="../scheduler.html">Scheduler</a> as a second parameter, and
-       the timer will operate on that Scheduler (<code>skipUntilWithTime</code> uses the <code>timeout</code>
-       Scheduler by default).
+       RxJS also implements a <code>skipUntil</code> operator that takes a <code>notifier</code> Observable as argument, and skips items until the notifier emits a value.
       </p>
       <h4>Sample Code</h4>
       <div class="code javascript"><pre>
 var source = Rx.Observable.timer(0, 1000)
-    .skipUntilWithTime(5000);
+  .take(10)
+  .skipUntil(Rx.Observable.timer(5000));
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
+Next: 5
 Next: 6
 Next: 7
 Next: 8
+Next: 9
 Completed</pre></div>
-      <p>
-       <code>skipUntilWithTime</code> is found in each of the following distributions:
+      </figcaption>
+     </figure>
+    <h4><code>skipWhile(predicate)</code></h4>
+    <figure>
+      <img src="images/skipWhile.png" style="width:100%;" alt="skipWhile" />
+      <figcaption><p>
+       The <code>skipWhile</code> operator takes a <code>predicate</code> as argument, and skips items while the predicate is satisfied for each item. When the source emits the first item that does not satisfy the predicate, this item and all subsequent items are emitted on the result Observable.
       </p>
-      <ul>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.time.js</code> (requires <code>rx.js</code> or <code>rx.compat.js</code>)</li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+var source = Rx.Observable.range(0, 5)
+  .skipWhile(i => i < 3);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: 3
+Next: 4
+Completed</pre></div>
       </figcaption>
      </figure>
   {% endlang_operator %}
