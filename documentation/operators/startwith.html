@@ -138,20 +138,26 @@ myObservable.startWith(-3, -2, -1, 0).subscribe(
       <figcaption><p>
        RxJS implements this operator as <code>startWith</code>. It accepts a variable number of
        function parameters and treats each one as an item that it will prepend to the resulting
-       Observable sequence in the order they are given in the parameter list.
-      </p></figcaption>
+       Observable sequence in the order they are given in the parameter list. If a <a href="../scheduler.html"><code>Scheduler</code></a> is given as a last parameter, that Scheduler is used to govern the prepending; by default this variant uses no scheduler (<code>null</code>).
+      </p>
+      <div class="code javascript"><pre>
+var source = Rx.Observable.of(4)
+  .startWith(1, 2, 3);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x.toString()),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: 1
+Next: 2
+Next: 3
+Next: 4
+Completed
+</pre></div>
+      </figcaption>
      </figure>
-     <p>
-      <code>startWith</code> is found in the following distributions:
-     </p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul>
   {% endlang_operator %}
 
   {% lang_operator RxKotlin startWith %}
