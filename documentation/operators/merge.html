@@ -277,7 +277,7 @@ Sequence complete.</pre></div>
       </ul></figcaption>
      </figure>
      <p>
-      The instance version of <code>merge</code> is <code>mergeWith</code>, so, for example, 
+      The instance version of <code>merge</code> is <code>mergeWith</code>, so, for example,
       instead of writing <code>Observable.merge(odds,evens)</code> you could also write
       <code>odds.mergeWith(evens)</code>.
      </p><p>
@@ -318,101 +318,75 @@ Sequence complete.</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS merge mergeAll mergeDelayError %}
+  {% lang_operator RxJS merge mergeAll %}
      <figure>
       <img src="images/merge.png" style="width:100%;" alt="merge" />
       <figcaption><p>
        The first variant of <code>merge</code> is an instance operator that takes a variable number
        of Observables as parameters, merging each of these Observables with the source (instance)
-       Observables to produce its single output Observable.
+       Observables to produce its single output Observable. It accepts two other optional parameters as the last parameters (in this order): <code>concurrent</code> and <code>scheduler</code>. If a number is given, it is interpreted as the <code>concurrent</code> parameter, indicating the maximum number of Observables that you want <code>merge</code> to attempt to be subscribed to at any moment. Once it reaches this maximum subscription count, it will refrain from subscribing to any other Observables until one of the already-subscribed-to Observables
+       issues a <code>complete</code> notification. If a <a href="../scheduler.html"><code>Scheduler</code></a> is given as a last parameter, that Scheduler is used to govern the merging; by default this variant uses no scheduler (<code>null</code>).</p>
       </p>
-      <p>
-       This first variant of <code>merge</code> is found in the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
-      <p>
-       The second variant of <code>merge</code> is a prototype (class) operator that accepts two
-       parameters. The second of these is an Observable that emits the Observables you want to merge.
-       The first is a number that indicates the maximum number of these emitted Observables that you
-       want <code>merge</code> to attempt to be subscribed to at any moment. Once it reaches this
-       maximum subscription count, it will refrain from subscribing to any other Observables emitted
-       by the source Observable until such time as one of the already-subscribed-to Observables
-       issues an <code>onCompleted</code> notification.
-      </p><p>
-       This second variant of <code>merge</code> is found in the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+/* Merge two sequences */
+var source1 = Rx.Observable.interval(100)
+  .map(x => 'First: ' + x);
+
+var source2 = Rx.Observable.interval(50)
+  .map(x => 'Second: ' + x);
+
+var source = source1
+  .merge(source2)
+  .take(5);
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x.toString()),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+      <div class="output"><pre>
+Next: Second: 0
+Next: First: 0
+Next: Second: 1
+Next: Second: 2
+Next: First: 1
+Completed
+</pre></div>
       </figcaption>
      </figure>
      <figure>
       <img src="images/mergeAll.png" style="width:100%;" alt="mergeAll" />
       <figcaption><p>
-       <code>mergeAll</code> is like this second variant of <code>merge</code> except that it does
-       not allow you to set this maximum subscription count. It only takes the single parameter of
-       an Observable of Observables.
+       <code>mergeAll</code> operates on an Observable of Observables and accepts a <code>concurrent</code> parameter (like in <code>merge</code>).
       </p>
-      <p>
-       <code>mergeAll</code> is found in the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
-      </figcaption>
-     </figure>
-     <figure>
-      <img src="images/mergeDelayError.png" style="width:100%;" alt="mergeDelayError" />
-      <figcaption><p>
-       If any of the individual Observables passed into <code>merge</code> or <code>mergeAll</code> terminates
-       with an <code>onError</code> notification, the resulting Observable will immediately terminate with an
-       <code>onError</code> notification. If you would prefer a merge that continues emitting the results of the
-       remaining, error-free Observables before reporting the error, use <code>mergeDelayError</code> instead.
-      </p>
-      <h4>Sample Code</h4>
       <div class="code javascript"><pre>
-var source1 = Rx.Observable.of(1,2,3);
-var source2 = Rx.Observable.throwError(new Error('whoops!'));
-var source3 = Rx.Observable.of(4,5,6);
+var source = Rx.Observable.of(
+    Rx.Observable.timer(0, 100).take(4),
+    Rx.Observable.timer(50, 100).take(4),
+    Rx.Observable.timer(100, 100).take(4)
+  )
+  .mergeAll(2)
+  .take(10);
 
-var merged = Rx.Observable.mergeDelayError(source1, source2, source3);
-
-var subscription = merged.subscribe(
-  function (x) { console.log('Next: %s', x); },
-  function (err) { console.log('Error: %s', err); }
-  function () { console.log('Completed' } );</pre></div>
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x.toString()),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
       <div class="output"><pre>
-1
-2
-3
-4
-5
-6
-Error: Error: whoops!</pre></div>
-      <p>
-       <code>mergeDelayError</code> is found in the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
+Next: 0
+Next: 0
+Next: 1
+Next: 1
+Next: 2
+Next: 2
+Next: 3
+Next: 3
+Next: 0
+Next: 1
+Completed
+</pre></div>
       </figcaption>
      </figure>
   {% endlang_operator %}
@@ -502,7 +476,7 @@ Error: Error: whoops!</pre></div>
 
   {% lang_operator RxPY merge merge_all merge_observable %}
      <p>
-      RxPY implements this operator as <code>merge</code> and 
+      RxPY implements this operator as <code>merge</code> and
       <code>merge_all</code>/<code>merge_observable</code>.
      </p>
      <figure>
