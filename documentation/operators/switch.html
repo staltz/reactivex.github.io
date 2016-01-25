@@ -86,29 +86,27 @@ id: switch
      <h4>Sample Code</h4>
      <div class="code javascript"><pre>
 var source = Rx.Observable.range(0, 3)
-    .select(function (x) { return Rx.Observable.range(x, 3); })
-    .switch();
+  .map(x => Rx.Observable.range(x, 3))
+  .switch();
 
 var subscription = source.subscribe(
-    function (x) { console.log('Next: ' + x); },
-    function (err) { console.log('Error: ' + err); },
-    function () { console.log('Completed'); });</pre></div>
+  (x) => console.log('Next: ' + x),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
      <div class="output"><pre>
 Next: 0
 Next: 1
 Next: 2
+Next: 1
+Next: 2
+Next: 3
+Next: 2
 Next: 3
 Next: 4
-Completed</pre></div>
-     <p><code>switch</code> is found in each of the following distributions:</p>
-     <ul>
-      <li><code>rx.js</code></li>
-      <li><code>rx.all.js</code></li>
-      <li><code>rx.all.compat.js</code></li>
-      <li><code>rx.compat.js</code></li>
-      <li><code>rx.lite.js</code></li>
-      <li><code>rx.lite.compat.js</code></li>
-     </ul></figcaption>
+Completed
+</pre></div>
+     </figcaption>
     </figure>
   {% endlang_operator %}
 
