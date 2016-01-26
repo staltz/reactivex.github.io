@@ -252,48 +252,33 @@ Sequence complete</pre></div>
      </figure>
   {% endlang_operator %}
 
-  {% lang_operator RxJS catch onErrorResumeNext %}
+  {% lang_operator RxJS catch %}
      <p>
-      RxJS implements the <span class="operator">Catch</span> operator with two distinct
-      operators:
+      RxJS implements this operator as <span class="operator">catch</span>.
      </p>
-     <dl>
-      <dt><code>catch</code></dt>
-       <dd>instructs an Observable to begin emitting a second Observable sequence if it encounters an error</dd>
-      <dt><code>onErrorResumeNext</code></dt>
-       <dd>instructs an Observable to begin emitting a second Observable sequence if it encounters an error or if the source Observable terminates normally</dd>
-     </dl>
-     <h4><code>catch</code></h4>
      <figure>
       <img src="images/catch.js.png" style="width:100%;" alt="catch" />
       <figcaption><p>
-       <code>catch</code> is found in the following distributions:
+        It accepts a <code>selector</code> function as the single argument. The <code>selector</code> function itself takes two parameters: <code>err</code> (the error being caught) and <code>caught</code> (the result Observable, coming from the <code>catch</code> operator itself). The <code>selector</code> should return an Observable to be merged as a substitute to the caught error.
       </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.all.js</code></li>
-       <li><code>rx.all.compat.js</code></li>
-       <li><code>rx.compat.js</code></li>
-       <li><code>rx.lite.js</code></li>
-       <li><code>rx.lite.compat.js</code></li>
-      </ul>
-      </figcaption>
-     </figure>
-     <h4><code>onErrorResumeNext</code></h4>
-     <figure>
-      <img src="images/onErrorResumeNext.js.png" style="width:100%;" alt="onErrorResumeNext" />
-      <figcaption><p>
-       This implementation borrows the confusing nomenclature from Rx.NET, in which
-       <code>onErrorResumeNext</code> switches to a back-up Observable both on an error <em>and</em>
-       on a normal, error-free termination of the source Observable.
-      </p>
-      <p>
-       <code>onErrorResumeNext</code> is found in the following distributions:
-      </p>
-      <ul>
-       <li><code>rx.js</code></li>
-       <li><code>rx.compat.js</code></li>
-      </ul>
+      <h4>Sample Code</h4>
+      <div class="code javascript"><pre>
+var source = Rx.Observable.of(1, 2)
+  .concat(Rx.Observable.throw('bad'))
+  .catch((err, caught) => Rx.Observable.of(3, 4));
+
+var subscription = source.subscribe(
+  (x) => console.log('Next: ' + x.toString()),
+  (err) => console.log('Error: ' + err),
+  () => console.log('Completed')
+);</pre></div>
+       <div class="output"><pre>
+Next: 1
+Next: 2
+Next: 3
+Next: 4
+Completed
+</pre></div>
       </figcaption>
      </figure>
   {% endlang_operator %}
